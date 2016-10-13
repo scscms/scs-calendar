@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>ES2015　日历控件</title>
     <style type="text/css">
-        .scs_calendar{border:1px solid #ddd;width:168px;font-size:12px}
+        .scs_calendar{border:1px solid #ddd;width:168px;font-size:12px;margin:100px 40%}
         .scs_calendar td{text-align: center}
         .scs_calendar td:hover{background-color: #f9f9f9;color: red}
     </style>
@@ -35,7 +35,7 @@
     let table = `<table border="0" cellpadding="5" cellspacing="0"><tr><td>日</td>
     <td>一</td><td>二</td><td>三</td><td>四</td><td>五</td><td>六</td></tr><tbody>`;
     //遍历组成一个7 X 6的日历界面
-    for(let l = 0;l <= 42;l ++){
+    for(let l = 0;l < 42;l ++){
         if(l % 7 == 0){
             table += `<tr>`;
         }
