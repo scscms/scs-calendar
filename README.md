@@ -7,7 +7,7 @@
 
 如图：
 
-![image](https://github.com/scscms/scs-calendar/raw/master/images/r4.jpg)
+![image](https://github.com/scscms/scs-calendar/raw/master/calendar.jpg)
 
 可看到，每个月的日历界面由上个月末尾几天和本月所有天数加上下个月的月初几天组成，共7 X 6 = 42个格子。
 主要难题其实就只有一个：获取某个月最后一天的号数是多少？网上大部分做法就是判断是否闰年是否是闰月等去取。
@@ -56,5 +56,3 @@ console.log(ymd);// Date {Mon Feb 29 2016 00:00:00 GMT+0800}
     document.querySelector(".scs_calendar").innerHTML = table;
 ```
 [查看完整代码](index.html)
-
-<a href="https://github.com/scscms/scs-calendar/raw/master/index.html">浏览器查看效果</a>（需要支持ES6浏览器）
