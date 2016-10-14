@@ -17,7 +17,7 @@ var ymd = new Date(2016,2,0);//自动获取到2016年2月最后一天日期
 console.log(ymd);// Date {Mon Feb 29 2016 00:00:00 GMT+0800}
 ```
 
-### 初级界面
+### 1.初级界面
 首先我们只显示当前月份的日期来实现一个简单界面：
 ```javascript
 	"use strict";
@@ -58,13 +58,29 @@ console.log(ymd);// Date {Mon Feb 29 2016 00:00:00 GMT+0800}
 ```
 [查看完整代码](index.html)
 
-### 添加年月select选择
+### 2.添加年月select选择
 
 [查看完整代码](index2.html)
 
 当然这是凭直觉直接写出来的代码。其中我们仍有优化的空间：比如年月select可只执行一次innerHTML；甚至table td也可一次性生成，后继修改其文本或样式即可；
 最后还没增加点击日期事件哟。
 
-### 经过优化的代码
+### 3.经过优化的代码
 
 思路是先使用js生成整体html然后根据传入的年份和月份修改相应的日期即可。同时使用事件委托监听点击事件。
+这样改变年月时调用的函数就很简洁了：
+```javascript
+    function scsCalendar(year,month){
+        const firstDay = new Date(year,month - 1,1);//当前日期的第一天日期
+        const lastDay = new Date(year,month,0).getDate();//获取本月最后一天的号数
+        let firstWeek = firstDay.getDay();//当前日期的第一天的星期
+        for(let i = 0;i < 42;i ++){
+            let td = dateObj.tds[i],day = i >= firstWeek && i < lastDay + firstWeek ? i - firstWeek + 1 : "";
+            td.innerHTML = day;//dateObj.tds.textContent
+            td.setAttribute("data-ymd",day ? year + "-" + month + "-" + ("0" + day).slice(-2) :"");
+        }
+        dateObj.selectDom[0].value = year;
+        dateObj.selectDom[1].value = month;
+    }
+```
+[查看完整代码](index3.html)

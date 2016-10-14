@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ES2015　日历控件　增加年月选择（优化版）</title>
+    <style type="text/css">
+        *{margin:0;padding:0}
+        .scs_calendar{border:1px solid #ddd;width:168px;font-size:12px;margin:100px 40%;-webkit-user-select:none;user-select:none;}
+        .scs_calendar select{margin-right:5px}
+        .scs_calendar td{text-align: center;width:24px;height:24px;cursor:default}
+        .scs_calendar a{float:right;margin-right:4px;color:#333;text-decoration: none}
+        .scs_calendar tbody + tbody td:hover{background-color: #f9f9f9;color: red}
+    </style>
+</head>
+<body>
+<div class="scs_calendar"></div>
+<script type="text/javascript">
+    "use strict";
+    const dateObj = {
+        htmlStr : `<p><a href="javascript:void(0)">关闭</a><select>`,//innerHTML文本
+        selectDom:null,//年月的select对象
+        tds:null,//所有日期td表格
+        calendarDom : document.querySelector(".scs_calendar")//日历对象
+    };
+    //生成日历所有html
+    for(let i = 1900;i <= 2050;i ++){
+        dateObj.htmlStr += `<option value="${i}">${i}</option>`;
+    }
+    dateObj.htmlStr += `</select><select>`;
+    for(let i = 1;i <= 12;i ++){
+        dateObj.htmlStr += `<option value="${i}">${i}</option>`;
+    }
+    dateObj.htmlStr += `</select></p><table border="0" cellpadding="5" cellspacing="0"><tbody><tr><td>日</td>
+    <td>一</td><td>二</td><td>三</td><td>四</td><td>五</td><td>六</td></tr></tbody><tbody>`;
+    //生成一个表格行代码再复制六份，避免了for循环。
+    let trStr = `<tr>${new Array(7).fill("<td></td>").join("")}</tr>`.repeat(6);
+    dateObj.htmlStr += `${trStr}</tbody></table>`;
+    dateObj.calendarDom.innerHTML = dateObj.htmlStr;
+
+    dateObj.tds = Array.from(dateObj.calendarDom.querySelectorAll("tbody + tbody td"));//转成数组并赋值
+    dateObj.selectDom = Array.from(dateObj.calendarDom.querySelectorAll("select"));//转成数组并赋值
+    dateObj.selectDom.forEach(function(obj){
+        obj.onchange = function(){
+            scsCalendar(dateObj.selectDom[0].value,dateObj.selectDom[1].value);
+        }
+    });
+    //委托点击事件
+    dateObj.calendarDom.addEventListener("click",function(e){
+        let tag = e.target;
+        if(tag.tagName == "A"){
+            console.log("关闭");
+        }else if(tag.tagName == "TD"){
+            let ymd = tag.getAttribute("data-ymd");
+            ymd && console.log(ymd);
+        }
+    },false);
+
+    function scsCalendar(year,month){
+        const firstDay = new Date(year,month - 1,1);//当前日期的第一天日期
+        const lastDay = new Date(year,month,0).getDate();//获取本月最后一天的号数
+        let firstWeek = firstDay.getDay();//当前日期的第一天的星期
+        for(let i = 0;i < 42;i ++){
+            let td = dateObj.tds[i],day = i >= firstWeek && i < lastDay + firstWeek ? i - firstWeek + 1 : "";
+            td.innerHTML = day;//dateObj.tds.textContent
+            td.setAttribute("data-ymd",day ? year + "-" + month + "-" + ("0" + day).slice(-2) :"");
+        }
+        dateObj.selectDom[0].value = year;
+        dateObj.selectDom[1].value = month;
+    }
+
+    let newYMD = new Date();
+    scsCalendar(newYMD.getFullYear(),newYMD.getMonth() + 1);
+</script>
+</body>
+</html>
