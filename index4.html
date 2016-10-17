@@ -11,7 +11,7 @@
             font:12px/24px "Microsoft YaHei";
             border:3px solid #ddd;
             border-radius:2px;box-shadow:0 0 3px #999;
-            width:168px;height:192px;overflow:hidden;
+            width:170px;height:194px;overflow:hidden;
             -webkit-user-select:none;user-select:none;
         }
         .scs_calendar select{margin-right:5px}
@@ -19,8 +19,8 @@
         .scs_calendar td{text-align: center;min-width:24px;height:24px;cursor:default}
         .scs_calendar a{float:right;margin-right:4px;color:#333;text-decoration: none}
 
-        .scs_calendar div{background-color:#fff;width:168px;height:186px;margin-top:6px;border-bottom: 1px solid red}
-        .scs_calendar_title{text-align: center;color:#1b1b1b}
+        .scs_calendar div{background-color:#fff;width:168px;height:186px;padding-top:6px;border:1px solid #adadad}
+        .scs_calendar_title{text-align: center;color:#1b1b1b;font-size:14px}
         .scs_calendar_prev,.scs_calendar_next{
             width:24px;height:20px;
             line-height: 24px;
@@ -40,6 +40,7 @@
             border-left: 7px solid #666;
         }
         .scs_calendar tfoot td{height:22px;line-height:22px;color:#111}
+        .scs_calendar tfoot td:hover,.scs_calendar_title:hover{color:#06c}
         .scs_calendar .scs_disabled{color:#999;}
         .scs_calendar .scs_on{color:#06c;background-color: #f7f7f7}
         .scs_calendar_select{position: absolute;transition:all 0.3s ease-in-out;top:-200px;}
@@ -53,7 +54,7 @@
         <table>
             <thead>
                 <tr>
-                    <td><p class="scs_calendar_prev"></p></td><td colspan="5"><p class="scs_calendar_title">December,2007</p></td><td><p class="scs_calendar_next"></p></td>
+                    <td><p class="scs_calendar_prev"></p></td><td colspan="5"><p class="scs_calendar_title">October,2016</p></td><td><p class="scs_calendar_next"></p></td>
                 </tr>
             </thead>
             <tbody>
@@ -62,12 +63,13 @@
                 </tr>
             </tbody>
             <tfoot>
-                <tr><td class="scs_disabled">1</td><td class="scs_disabled">2</td><td class="scs_disabled">3</td><td>4</td><td>5</td><td>6</td><td>7</td></tr>
-                <tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td></tr>
-                <tr><td>1</td><td>2</td><td>3</td><td class="scs_on">4</td><td>5</td><td>6</td><td>7</td></tr>
-                <tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td></tr>
-                <tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td></tr>
-                <tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td></tr>
+                <tr><td class="scs_disabled">25</td><td class="scs_disabled">26</td><td class="scs_disabled">27</td>
+                    <td class="scs_disabled">28</td><td class="scs_disabled">29</td><td class="scs_disabled">30</td><td>1</td></tr>
+                <tr><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td></tr>
+                <tr><td>9</td><td>10</td><td>11</td><td class="scs_on">12</td><td>13</td><td>14</td><td>15</td></tr>
+                <tr><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td><td>21</td><td>22</td></tr>
+                <tr><td>23</td><td>24</td><td>25</td><td>26</td><td>27</td><td>28</td><td>29</td></tr>
+                <tr><td>30</td><td>31</td><td class="scs_disabled">1</td><td class="scs_disabled">2</td><td class="scs_disabled">3</td><td class="scs_disabled">4</td><td class="scs_disabled">5</td></tr>
             </tfoot>
         </table>
     </div>
@@ -93,32 +95,37 @@
 <script type="text/javascript">
     "use strict";
     const dateObj = {
-        months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],//月份文本["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"]
-        weekMin:["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],//星期文本["日","一","二","三","四","五","六"]
+        ymd:[],
+        view: 'day',//视图[day,month,year]
+        htmlStr:`<div><table>`,
+        trHead :function(n){
+            return `<thead>
+            <tr>
+                <td><p class="scs_calendar_prev"></p></td>
+                <td${n ? ' colspan="5"':''}><p class="scs_calendar_title"></p></td>
+                <td><p class="scs_calendar_next"></p></td>
+            </tr>
+            </thead>`
+        },
+        months: ["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"],//月份文本["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+        weekMin:["日","一","二","三","四","五","六"],//星期文本
+        index:0,//td的序号
         calendarDom : document.querySelector(".scs_calendar")//日历对象
     };
     //生成日历所有html
-    for(let i = 1900;i <= 2050;i ++){
-        dateObj.htmlStr += `<option value="${i}">${i}</option>`;
-    }
-    dateObj.htmlStr += `</select><select>`;
-    for(let i = 1;i <= 12;i ++){
-        dateObj.htmlStr += `<option value="${i}">${i}</option>`;
-    }
-    dateObj.htmlStr += `</select></p><table border="0" cellpadding="5" cellspacing="0"><tbody><tr><td>日</td>
-    <td>一</td><td>二</td><td>三</td><td>四</td><td>五</td><td>六</td></tr></tbody><tbody>`;
-    //生成一个表格行代码再复制六份，避免了for循环。
+    dateObj.htmlStr += dateObj.trHead(5);
+    dateObj.htmlStr += `<tbody><tr><td>${dateObj.weekMin.join('</td><td>')}</td></tr></tbody>`;
     let trStr = `<tr>${new Array(7).fill("<td></td>").join("")}</tr>`.repeat(6);
-    //dateObj.htmlStr += `${trStr}</tbody></table>`;
-    //dateObj.calendarDom.innerHTML = dateObj.htmlStr;
+    dateObj.htmlStr += `<tfoot>${trStr}</tfoot></table></div>`;
 
-    dateObj.tds = Array.from(dateObj.calendarDom.querySelectorAll("tbody + tbody td"));//转成数组并赋值
-    dateObj.selectDom = Array.from(dateObj.calendarDom.querySelectorAll("select"));//转成数组并赋值
-    dateObj.selectDom.forEach(function(obj){
-        obj.onchange = function(){
-            scsCalendar(dateObj.selectDom[0].value,dateObj.selectDom[1].value);
-        }
-    });
+    dateObj.htmlStr += `<div class="scs_calendar_select"><table>${dateObj.trHead()}<tfoot>`;
+    trStr = `<tr>${new Array(3).fill("<td></td>").join("")}</tr>`.repeat(4);
+    dateObj.htmlStr += `${trStr}</tfoot></table></div>`;
+    dateObj.calendarDom.innerHTML = dateObj.htmlStr;
+
+    dateObj.divs = Array.from(dateObj.calendarDom.querySelectorAll("div"));//转成数组并赋值
+    dateObj.tds = Array.from(dateObj.calendarDom.querySelectorAll("tfoot td"));//所有td转成数组并赋值
+    dateObj.title = Array.from(dateObj.calendarDom.querySelectorAll(".scs_calendar_title"));
     //委托点击事件
     dateObj.calendarDom.addEventListener("click",function(e){
         let tag = e.target;
@@ -129,21 +136,62 @@
             ymd && console.log(ymd);
         }
     },false);
+    //渲染年月
+    var year = 1912;
+    var n = 1899 + Math.ceil((year - 1899) / 12) * 12;
+    for(var i = 0;i < 12;i ++){
+        console.log(n - 12 + i);
+    }
 
-    function scsCalendar(year,month){
+    function renderYearOrMonth(mold){
+        if(!/^(month|year)$/.test(mold)){
+            throw new Error("error mold");
+        }
+        let title = dateObj.title[1];
+        let tds = dateObj.tds.slice(42);
+        let year = dateObj.ymd[0];
+        let month = dateObj.ymd[1];
+        if(mold == "month"){
+            title.textContent = dateObj.months[month - 1];
+            tds.forEach(function(td,i){
+                td.textContent = dateObj.months[i];
+                td.className = i == month - 1 ? "scs_on":"";
+                td.setAttribute("data-month",i);
+            })
+        }else{
+            var n = 1900 + parseInt((year - 1900) / 12) * 12;
+            tds.forEach(function(td,i){
+                td.textContent = n + i;
+                td.className = n + i == year ? "scs_on":"";
+                td.setAttribute("data-value",n + i);
+            });
+            title.textContent = n + "-" + (n + 11);
+        }
+        dateObj.calendarDom.classList.add("scs_calendar_open");
+    }
+    //渲染单元格
+    function dealTD(date_time,class_name){
+        let td = dateObj.tds[dateObj.index ++];
+        let day = ("0" + date_time.getDate()).slice(-2);
+        let month = ("0" + (date_time.getMonth() + 1)).slice(-2);
+        td.setAttribute("data-ymd",date_time.getFullYear() + "-" + month + "-" + day);
+        td.textContent = day;
+        td.className = class_name;
+    }
+    function scsCalendar(){
+        dateObj.index = 0;
+        let year = dateObj.ymd[0],month= dateObj.ymd[1];
         const firstDay = new Date(year,month - 1,1);//当前日期的第一天日期
         const lastDay = new Date(year,month,0).getDate();//获取本月最后一天的号数
         let firstWeek = firstDay.getDay();//当前日期的第一天的星期
-        for(let i = 0;i < 42;i ++){
-            let td = dateObj.tds[i],day = i >= firstWeek && i < lastDay + firstWeek ? i - firstWeek + 1 : "";
-            td.innerHTML = day;//dateObj.tds.textContent
-            td.setAttribute("data-ymd",day ? year + "-" + month + "-" + ("0" + day).slice(-2) :"");
+        for(let i = 1;i <= 42;i ++){
+            dealTD(new Date(year,month - 1,i > firstWeek ? i - firstWeek:firstWeek * - 1 + i),i <= lastDay + firstWeek && i > firstWeek ? "":"scs_disabled");
         }
-        dateObj.selectDom[0].value = year;
-        dateObj.selectDom[1].value = month;
+        dateObj.title[0].textContent = dateObj.months[month - 1] + "," + year;
     }
-
     let newYMD = new Date();
+    dateObj.ymd = [newYMD.getFullYear(),newYMD.getMonth() + 1,newYMD.getDate()];
+    scsCalendar();
 </script>
 </body>
 </html>
