@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8"/>
     <title>ES2015　日历控件　非select选择年月</title>
     <style type="text/css">
         *{margin:0;padding:0}
@@ -43,67 +43,25 @@
         .scs_calendar tfoot td:hover,.scs_calendar_title:hover{color:#06c}
         .scs_calendar .scs_disabled{color:#999;}
         .scs_calendar .scs_on{color:#06c;background-color: #f7f7f7}
-        .scs_calendar_select{position: absolute;transition:all 0.3s ease-in-out;top:-200px;}
-        .scs_calendar_open .scs_calendar_select{transition:all 0.3s ease-in-out;transform:translate(0,200px)}
-        .scs_calendar_select tfoot td{height:40px;width:33%}
+        .scs_calendar_year,.scs_calendar_month{position: absolute;transition:all 0.3s ease-in-out;top:-200px;}
+        .scs_calendar_open_year .scs_calendar_year,
+        .scs_calendar_open_month .scs_calendar_month
+        {transition:all 0.3s ease-in-out;transform:translate(0,200px)}
+        .scs_calendar_year tfoot td,
+        .scs_calendar_month tfoot td{height:40px;width:33%}
     </style>
 </head>
 <body>
-<div class="scs_calendar">
-    <div>
-        <table>
-            <thead>
-                <tr>
-                    <td><p class="scs_calendar_prev"></p></td><td colspan="5"><p class="scs_calendar_title">October,2016</p></td><td><p class="scs_calendar_next"></p></td>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>日</td><td>一</td><td>二</td><td>三</td><td>四</td><td>五</td><td>六</td>
-                </tr>
-            </tbody>
-            <tfoot>
-                <tr><td class="scs_disabled">25</td><td class="scs_disabled">26</td><td class="scs_disabled">27</td>
-                    <td class="scs_disabled">28</td><td class="scs_disabled">29</td><td class="scs_disabled">30</td><td>1</td></tr>
-                <tr><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td></tr>
-                <tr><td>9</td><td>10</td><td>11</td><td class="scs_on">12</td><td>13</td><td>14</td><td>15</td></tr>
-                <tr><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td><td>21</td><td>22</td></tr>
-                <tr><td>23</td><td>24</td><td>25</td><td>26</td><td>27</td><td>28</td><td>29</td></tr>
-                <tr><td>30</td><td>31</td><td class="scs_disabled">1</td><td class="scs_disabled">2</td><td class="scs_disabled">3</td><td class="scs_disabled">4</td><td class="scs_disabled">5</td></tr>
-            </tfoot>
-        </table>
-    </div>
-
-    <div class="scs_calendar_select">
-        <table>
-            <thead>
-            <tr>
-                <td><p class="scs_calendar_prev"></p></td>
-                <td><p class="scs_calendar_title">1900-1911</p></td>
-                <td><p class="scs_calendar_next"></p></td>
-            </tr>
-            </thead>
-            <tfoot>
-            <tr><td>1900</td><td>1901</td><td>1902</td></tr>
-            <tr><td>1900</td><td class="scs_on">1901</td><td>1902</td></tr>
-            <tr><td>1900</td><td>1901</td><td>1902</td></tr>
-            <tr><td>1900</td><td>1901</td><td>1902</td></tr>
-            </tfoot>
-        </table>
-    </div>
-</div>
+<div class="scs_calendar"></div>
 <script type="text/javascript">
     "use strict";
     const dateObj = {
-        ymd:[],
-        view: 'day',//视图[day,month,year]
-        htmlStr:`<div><table>`,
-        trHead :function(n){
+        trHead :function(t){
             return `<thead>
             <tr>
-                <td><p class="scs_calendar_prev"></p></td>
-                <td${n ? ' colspan="5"':''}><p class="scs_calendar_title"></p></td>
-                <td><p class="scs_calendar_next"></p></td>
+                <td>${t =='m'?'&nbsp;':'<p class="scs_calendar_prev"></p>'}</td>
+                <td${t == 'd' ? ' colspan="5"':''}><p class="scs_calendar_title"></p></td>
+                <td>${t =='m'?'&nbsp;':'<p class="scs_calendar_next"></p>'}</p></td>
             </tr>
             </thead>`
         },
@@ -113,85 +71,147 @@
         calendarDom : document.querySelector(".scs_calendar")//日历对象
     };
     //生成日历所有html
-    dateObj.htmlStr += dateObj.trHead(5);
-    dateObj.htmlStr += `<tbody><tr><td>${dateObj.weekMin.join('</td><td>')}</td></tr></tbody>`;
-    let trStr = `<tr>${new Array(7).fill("<td></td>").join("")}</tr>`.repeat(6);
-    dateObj.htmlStr += `<tfoot>${trStr}</tfoot></table></div>`;
+    let htmlStr = `<div><table>${dateObj.trHead("d")}`;//日历模板
+    htmlStr += `<tbody><tr><td>${dateObj.weekMin.join('</td><td>')}</td></tr></tbody>`;
+    let _trStr = `<tr>${new Array(7).fill("<td></td>").join("")}</tr>`.repeat(6);
+    htmlStr += `<tfoot>${_trStr}</tfoot></table></div>`;
 
-    dateObj.htmlStr += `<div class="scs_calendar_select"><table>${dateObj.trHead()}<tfoot>`;
-    trStr = `<tr>${new Array(3).fill("<td></td>").join("")}</tr>`.repeat(4);
-    dateObj.htmlStr += `${trStr}</tfoot></table></div>`;
-    dateObj.calendarDom.innerHTML = dateObj.htmlStr;
+    _trStr = `<tr>${new Array(3).fill("<td></td>").join("")}</tr>`.repeat(4);
+    htmlStr += `<div class="scs_calendar_month"><table>${dateObj.trHead("m")}<tfoot>`;
+    htmlStr += `${_trStr}</tfoot></table></div>`;
+    htmlStr += `<div class="scs_calendar_year"><table>${dateObj.trHead("y")}<tfoot>`;
+    htmlStr += `${_trStr}</tfoot></table></div>`;
 
-    dateObj.divs = Array.from(dateObj.calendarDom.querySelectorAll("div"));//转成数组并赋值
+    dateObj.calendarDom.innerHTML = htmlStr;
+
     dateObj.tds = Array.from(dateObj.calendarDom.querySelectorAll("tfoot td"));//所有td转成数组并赋值
     dateObj.title = Array.from(dateObj.calendarDom.querySelectorAll(".scs_calendar_title"));
+    dateObj.buttons = Array.from(dateObj.calendarDom.querySelectorAll(".scs_calendar_prev,.scs_calendar_next"));
+
     //委托点击事件
     dateObj.calendarDom.addEventListener("click",function(e){
         let tag = e.target;
-        if(tag.tagName == "A"){
-            console.log("关闭");
-        }else if(tag.tagName == "TD"){
-            let ymd = tag.getAttribute("data-ymd");
-            ymd && console.log(ymd);
+        let ymd = tag.getAttribute("data-ymd");
+        if(tag.tagName == "TD" && ymd){
+            if(tag.parentNode.parentNode.parentNode.parentNode.className.startsWith("scs_calendar_")){
+                ProxyObj[ymd.length == 4 ? "year":"month"] = Number.parseInt(ymd);
+                ProxyObj.view = [ymd.length == 4 ? "month":"day"];
+            }else{
+                ymd && console.log(ymd);
+            }
+        }else if(tag.tagName == "P"){
+            let index = dateObj.buttons.findIndex(function(value,index,arr){
+                return value == tag;
+            });
+            switch(index){
+                case 0:
+                    ProxyObj.month --;//上个月
+                    break;
+                case 1:
+                    ProxyObj.month ++;//下个月
+                    break;
+                case 2:
+                    ProxyObj.year -= 12;//上12年
+                    break;
+                case 3:
+                    ProxyObj.year += 12;//下12年
+                    break;
+                default :
+                    dateObj.title.forEach(function(obj,i){
+                        if(obj == tag){
+                            ProxyObj.view = ["month","year","month"][i];
+                        }
+                    })
+            }
         }
     },false);
-    //渲染年月
-    var year = 1912;
-    var n = 1899 + Math.ceil((year - 1899) / 12) * 12;
-    for(var i = 0;i < 12;i ++){
-        console.log(n - 12 + i);
-    }
-
-    function renderYearOrMonth(mold){
-        if(!/^(month|year)$/.test(mold)){
-            throw new Error("error mold");
-        }
-        let title = dateObj.title[1];
-        let tds = dateObj.tds.slice(42);
-        let year = dateObj.ymd[0];
-        let month = dateObj.ymd[1];
-        if(mold == "month"){
-            title.textContent = dateObj.months[month - 1];
-            tds.forEach(function(td,i){
-                td.textContent = dateObj.months[i];
-                td.className = i == month - 1 ? "scs_on":"";
-                td.setAttribute("data-month",i);
-            })
-        }else{
-            var n = 1900 + parseInt((year - 1900) / 12) * 12;
-            tds.forEach(function(td,i){
-                td.textContent = n + i;
-                td.className = n + i == year ? "scs_on":"";
-                td.setAttribute("data-value",n + i);
-            });
-            title.textContent = n + "-" + (n + 11);
-        }
-        dateObj.calendarDom.classList.add("scs_calendar_open");
-    }
-    //渲染单元格
-    function dealTD(date_time,class_name){
+    function dealYMTd(number,cls){
         let td = dateObj.tds[dateObj.index ++];
-        let day = ("0" + date_time.getDate()).slice(-2);
-        let month = ("0" + (date_time.getMonth() + 1)).slice(-2);
-        td.setAttribute("data-ymd",date_time.getFullYear() + "-" + month + "-" + day);
-        td.textContent = day;
-        td.className = class_name;
+        td.setAttribute("data-ymd",number);
+        td.textContent = number > 100 ? number : dateObj.months[number - 1];
+        td.className = number == cls ? "scs_on" : "";
     }
+    function renderYearOrMonth(){
+        let view = ProxyObj.view;
+        if(view == "year"){
+            dateObj.index = 54;//单元格下标
+            let start = 1900 + Math.ceil((ProxyObj.year - 1899) / 12) * 12;
+            for(let i = 0;i < 12;i ++){
+                dealYMTd(start - 12 + i,ProxyObj.year);
+            }
+            dateObj.title[2].textContent = (start - 12) +"-"+ (start - 1);
+        }else if(view == "month"){
+            dateObj.index = 42;//单元格下标
+            for(let i = 1;i <= 12;i ++){
+                dealYMTd(i,ProxyObj.month);
+            }
+            dateObj.title[1].textContent = ProxyObj.year;
+        }
+        dateObj.calendarDom.className = "scs_calendar";//恢复
+        view != "day" && dateObj.calendarDom.classList.add("scs_calendar_open_" + view);
+    }
+    //渲染日历主体
     function scsCalendar(){
         dateObj.index = 0;
-        let year = dateObj.ymd[0],month= dateObj.ymd[1];
+        let year = ProxyObj.year,
+            month = ProxyObj.month;
         const firstDay = new Date(year,month - 1,1);//当前日期的第一天日期
         const lastDay = new Date(year,month,0).getDate();//获取本月最后一天的号数
         let firstWeek = firstDay.getDay();//当前日期的第一天的星期
+        firstWeek == 0 && (firstWeek = 7);//处理特殊情况
         for(let i = 1;i <= 42;i ++){
-            dealTD(new Date(year,month - 1,i > firstWeek ? i - firstWeek:firstWeek * - 1 + i),i <= lastDay + firstWeek && i > firstWeek ? "":"scs_disabled");
+            //渲染单元格
+            let date_time = new Date(year,month - 1,i > firstWeek ? i - firstWeek:firstWeek * - 1 + i);
+            let td = dateObj.tds[dateObj.index ++];
+            let day = ("0" + date_time.getDate()).slice(-2);
+            td.setAttribute("data-ymd",date_time.getFullYear() + "-" + ("0" + (date_time.getMonth() + 1)).slice(-2) + "-" + day);
+            td.textContent = day;
+            td.className = i <= lastDay + firstWeek && i > firstWeek ? "":"scs_disabled";
         }
         dateObj.title[0].textContent = dateObj.months[month - 1] + "," + year;
+        ProxyObj.view != "day" && renderYearOrMonth();
     }
-    let newYMD = new Date();
-    dateObj.ymd = [newYMD.getFullYear(),newYMD.getMonth() + 1,newYMD.getDate()];
-    scsCalendar();
+
+    let newYMD = new Date();//当前日期
+    //设置代理自动触发
+    const ProxyObj = new Proxy({
+        year:newYMD.getFullYear(),
+        month:1,
+        view:"day"　//视图[day,month,year]
+    }, {
+        set: function (target, key, value, receiver) {
+            if(key == "view"){
+                if(!/^(day|month|year)$/.test(value)){
+                    throw new Error("错误类型！");
+                }
+            }else{
+                if(!Number.isFinite(value)){
+                    throw new Error("错误数值类型！");
+                }
+                if(key == "year"){
+                    if(value < 1900 || value > 2151){
+                        throw new Error("日期超出范围！");
+                    }
+                }else if(key == "month"){
+                    let y = ProxyObj.year;
+                    if(value > 12){
+                        Reflect.set(target, "year", y + 1);
+                        value = 1;
+                    }else if(value < 1){
+                        Reflect.set(target, "year", y - 1);
+                        value = 12;
+                    }
+                }else{
+                    throw new Error("未知类型！",key);
+                }
+            }
+            setTimeout(function(){
+                key == "view" ? renderYearOrMonth() : scsCalendar();//自动渲染日历
+            },0);
+            return Reflect.set(target, key, value, receiver);
+        }
+    });
+    ProxyObj.month = newYMD.getMonth() + 1;//触发代理
 </script>
 </body>
 </html>
